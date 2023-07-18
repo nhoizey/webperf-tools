@@ -11,7 +11,7 @@ Get last 12 months Web Vitals graphs as images for a device form factor.
 
 Run `./web-vitals-graphs.js --help` to get informations about the options
 
-```shell
+```bash
 Usage: web-vitals-graphs.js graphs <domain> [device]
 
 Commands:
