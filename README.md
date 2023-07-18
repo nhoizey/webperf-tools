@@ -9,4 +9,7 @@ Get last 12 months Web Vitals graphs as images for a device form factor.
 
 ## Usage
 
-`./web-vitals-graphs.js --help`
+Run `./web-vitals-graphs.js --help` to get informations about the options
+
+Example:
+`./web-vitals-graphs.js --domain www.clever-age.com --device desktop`
