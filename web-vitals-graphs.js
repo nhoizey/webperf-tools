@@ -16,6 +16,7 @@ const vitals = [
 const dateString = new Date().toISOString().slice(0, 10);
 
 const argv = require("yargs/yargs")(process.argv.slice(2))
+  .detectLocale(false)
   .usage("Usage: $0 graphs <domain> [device]")
   .command(
     "graphs <domain> [device]",
