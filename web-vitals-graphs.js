@@ -17,23 +17,26 @@ const dateString = new Date().toISOString().slice(0, 10);
 
 const argv = require("yargs/yargs")(process.argv.slice(2))
   .detectLocale(false)
-  .usage("Usage: $0 graphs <domain> [device]")
+  .usage("Usage: $0 graphs <domain> [device] [reverse]")
   .command(
-    "graphs <domain> [device]",
+    "graphs <domain> [device] [reverse]",
     "Get last 12 months Web Vitals graphs as images for a device form factor"
   )
   .describe({
     domain: "Domain",
     device: "Form factor",
+    reverse: "Reverse domain name parts (for better file system sorting)",
   })
+  .boolean("reverse")
   .choices("device", ["phone", "desktop"])
-  .default("device", "phone")
+  .default({ device: "phone", reverse: false })
   .demandOption(["domain"])
   .help().argv;
 
 (async () => {
   const DOMAIN = argv.domain;
   const DEVICE = argv.device;
+  const REVERSE = argv.reverse;
 
   const browser = await puppeteer.launch({
     executablePath:
@@ -69,7 +72,12 @@ const argv = require("yargs/yargs")(process.argv.slice(2))
       document.head.appendChild(style);
     });
 
-    const directory = path.join("./graphs/", DOMAIN, dateString, DEVICE);
+    const directory = path.join(
+      "./graphs/",
+      REVERSE ? DOMAIN.split(".").reverse().join(".") : DOMAIN,
+      dateString,
+      DEVICE
+    );
     await fs.mkdir(directory, { recursive: true });
 
     await Promise.all(
