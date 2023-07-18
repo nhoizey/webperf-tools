@@ -9,7 +9,8 @@
 
 Get last 12 months Web Vitals graphs as images for a device form factor.
 
-This would not be possible without **Treo**'s awesome free [Site Speed](https://treo.sh/sitespeed) reports, beautiful graphs built with Google's [Chrome UX Report](https://developer.chrome.com/docs/crux/) data.
+> **Note**
+> This would not be possible without **Treo**'s awesome free [Site Speed](https://treo.sh/sitespeed) reports, beautiful graphs built with Google's [Chrome UX Report](https://developer.chrome.com/docs/crux/) data.
 
 ### Usage
 
