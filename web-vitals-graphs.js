@@ -17,14 +17,15 @@ const dateString = new Date().toISOString().slice(0, 10);
 
 const argv = require("yargs/yargs")(process.argv.slice(2))
   .detectLocale(false)
-  .usage("Usage: $0 graphs <domain> [device] [reverse]")
+  .usage("Usage: $0 graphs [domain] [device] [country] [reverse]")
   .command(
-    "graphs <domain> [device] [reverse]",
+    "graphs [domain] [device] [country] [reverse]",
     "Get last 12 months Web Vitals graphs as images for a device form factor"
   )
   .describe({
     domain: "Domain",
     device: "Form factor",
+    country: "Country",
     reverse: "Reverse domain name parts (for better file system sorting)",
   })
   .boolean("reverse")
@@ -36,6 +37,7 @@ const argv = require("yargs/yargs")(process.argv.slice(2))
 (async () => {
   const DOMAIN = argv.domain;
   const DEVICE = argv.device;
+  const COUNTRY = argv.country;
   const REVERSE = argv.reverse;
 
   const browser = await puppeteer.launch({
@@ -52,9 +54,15 @@ const argv = require("yargs/yargs")(process.argv.slice(2))
       deviceScaleFactor: 2,
     });
 
-    console.log(`Get Treo graphs for ${DOMAIN} on ${DEVICE}`);
+    console.log(
+      `Get Treo graphs for ${DOMAIN}, ${
+        COUNTRY ? `in "${COUNTRY}"` : "globaly"
+      }, on ${DEVICE}`
+    );
 
-    const TREO_URL = `https://treo.sh/sitespeed/${DOMAIN}?formFactor=${DEVICE}&metricsMode=d`;
+    const TREO_URL = `https://treo.sh/sitespeed/${DOMAIN}?formFactor=${DEVICE}&metricsMode=d${
+      COUNTRY ? `&countryCode=${COUNTRY}` : ""
+    }`;
 
     await page.goto(TREO_URL, { waitUntil: "networkidle0", timeout: 0 });
 
@@ -72,9 +80,11 @@ const argv = require("yargs/yargs")(process.argv.slice(2))
       document.head.appendChild(style);
     });
 
-    const directory = path.join(
-      "./graphs/",
+    let directory = path.join(
+      ".",
+      "graphs",
       REVERSE ? DOMAIN.split(".").reverse().join(".") : DOMAIN,
+      COUNTRY ? COUNTRY : "global",
       dateString,
       DEVICE
     );
