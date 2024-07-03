@@ -26,3 +26,6 @@
 
 ./web-vitals-graphs.js graphs --domain www.ynov.com --device phone --country fr --reverse
 ./web-vitals-graphs.js graphs --domain www.ynov.com --device desktop --country fr --reverse
+
+./web-vitals-graphs.js graphs --domain www.krys.com --device phone --country fr --reverse
+./web-vitals-graphs.js graphs --domain www.krys.com --device desktop --country fr --reverse
