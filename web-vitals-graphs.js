@@ -9,8 +9,7 @@ const vitals = [
   { vital: "fcp", selector: "div.isSingle.isCompact:nth-child(2)" },
   { vital: "lcp", selector: "div.isSingle.isCompact:nth-child(3)" },
   { vital: "cls", selector: "div.isSingle.isCompact:nth-child(4)" },
-  { vital: "fid", selector: "div.isSingle.isCompact:nth-child(5)" },
-  { vital: "inp", selector: "div.isSingle.isCompact:nth-child(6)" },
+  { vital: "inp", selector: "div.isSingle.isCompact:nth-child(5)" },
 ];
 
 const dateString = new Date().toISOString().slice(0, 10);
