@@ -1,16 +1,11 @@
 #!/usr/bin/env node
 
 const fs = require("fs/promises");
+const fsSync = require("fs");
 const path = require("node:path");
 const puppeteer = require("puppeteer-core");
 
-const vitals = [
-  { vital: "ttfb", selector: "div.isSingle.isCompact:nth-child(1)" },
-  { vital: "fcp", selector: "div.isSingle.isCompact:nth-child(2)" },
-  { vital: "lcp", selector: "div.isSingle.isCompact:nth-child(3)" },
-  { vital: "cls", selector: "div.isSingle.isCompact:nth-child(4)" },
-  { vital: "inp", selector: "div.isSingle.isCompact:nth-child(5)" },
-];
+const vitals = { "Time to First Byte": "ttfb", "First Contentful Paint": "fcp", "Largest Contentful Paint": "lcp", "Cumulative Layout Shift": "cls", "Interaction to Next Paint": "inp" };
 
 const dateString = new Date().toISOString().slice(0, 10);
 
@@ -59,25 +54,11 @@ const argv = require("yargs/yargs")(process.argv.slice(2))
       }, on ${DEVICE}`
     );
 
-    const TREO_URL = `https://treo.sh/sitespeed/${DOMAIN}?formFactor=${DEVICE}&metricsMode=d${
+    const TREO_URL = `https://treo.sh/sitespeed/${DOMAIN}?siteFlags=dist&formFactor=${DEVICE}${
       COUNTRY ? `&countryCode=${COUNTRY}` : ""
     }`;
 
-    await page.goto(TREO_URL, { waitUntil: "networkidle0", timeout: 0 });
-
-    await page.evaluate(() => {
-      let style = document.createElement("style");
-
-      style.innerHTML = `
-        .isSingle.isCompact {
-          padding: 0.2rem !important;
-        }
-        .isSingle.isCompact :last-child {
-          margin: 0.5rem 0;
-        }
-        `;
-      document.head.appendChild(style);
-    });
+    await page.goto(TREO_URL, { waitUntil: "domcontentloaded", timeout: 0 });
 
     let directory = path.join(
       ".",
@@ -89,14 +70,22 @@ const argv = require("yargs/yargs")(process.argv.slice(2))
     );
     await fs.mkdir(directory, { recursive: true });
 
-    await Promise.all(
-      vitals.map(async (entry) => {
-        const { vital, selector } = entry;
-        const file = path.join(directory, `${vital}.png`);
+    const graphs = await page.$$(`#metrics + div > div`);
 
-        const graph = await page.$(selector);
-        if (graph) {
-          await graph.screenshot({ path: file, type: "png" });
+    await Promise.all(
+      graphs.map(async (graph) => {
+        try {
+          const fullname = await graph.$eval("h3", (el) => el.textContent.trim());
+          const vital = vitals[fullname];
+          const file = path.join(directory, `${vital}.png`);
+
+          // console.log(`Processing graph: ${fullname}`);
+          if (!fsSync.existsSync(file)) {
+            await page.waitForTimeout(1000);
+            await graph.screenshot({ path: file, type: "png" });
+          }
+        } catch (e) {
+          console.log(`Error capturing graph: ${e}`);
         }
       })
     );
